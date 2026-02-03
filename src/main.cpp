@@ -21,8 +21,6 @@ using namespace std;
 /**
  * TO DO:
  *
- * - make datatypes
- * - print messages
  * - run server
  * -
  */

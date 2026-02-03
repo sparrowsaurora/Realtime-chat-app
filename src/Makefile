@@ -2,7 +2,7 @@ CXX = g++
 CXXFLAGS = -Wall -Wextra -std=c++17 -Icomponents
 
 TARGET = app
-SRCS = main.cpp components/message.cpp
+SRCS = main.cpp components/message/message.cpp
 OBJS = $(SRCS:.cpp=.o)
 
 all: $(TARGET)

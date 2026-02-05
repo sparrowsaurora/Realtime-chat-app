@@ -18,7 +18,7 @@ this runs the daemon process.
 rtc run --room <id>
 ```
 
-you can now view the room via the following command
+you can now view the room via the following command  
 _this looks at the stored room ID_
 
 ```shell
@@ -27,11 +27,15 @@ rtc view
 
 then when you want to send a message,  
 you can either send a message in the chatroom ui  
-or by using the # symbol in your terminal like
+or by using the % symbol in your terminal like
 
 ```shell
 % this is a test message
 ```
+
+## Credits
+
+This project uses **argparse** by **p-ranav**, licensed under the **MIT** license type
 
 ## Contact
 

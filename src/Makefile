@@ -1,8 +1,8 @@
 CXX = g++
-CXXFLAGS = -Wall -Wextra -std=c++17 -Icomponents
+CXXFLAGS = -Wall -Wextra -std=c++17 -Icomponents -Iinclude
 
 TARGET = app
-SRCS = main.cpp components/message/message.cpp
+SRCS = main.cpp components/message/message.cpp components/client/client.cpp components/server/server.cpp
 OBJS = $(SRCS:.cpp=.o)
 
 all: $(TARGET)
@@ -10,6 +10,8 @@ all: $(TARGET)
 $(TARGET): $(OBJS)
 	$(CXX) $(CXXFLAGS) $(OBJS) -o $(TARGET)
 	rm -f $(OBJS)
+	rm -f main.o
+	mv app ..
 
 %.o: %.cpp
 	$(CXX) $(CXXFLAGS) -c $< -o $@

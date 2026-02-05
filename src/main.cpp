@@ -1,33 +1,70 @@
 /*******************************************************************
  *
- * File Name: main.c
+ * File Name: server.c
  *
  * Description:
- *   main definitions and running the program
+ *   Runs the server that clients connect to.
  *
  * Author: sparrow
- * Date: 3/2/2026
+ * Date: 5/2/2026
  *
  *******************************************************************/
 
-#include <ctime>
+#include <algorithm>
+#include <argparse.hpp>
+#include <cctype>
 #include <iostream>
 #include <string>
 
-#include "message.h"
+#define VERSION 1
 
-using namespace std;
+std::string clean_command(std::string cmd) {
+    // Find first non-whitespace character
+    cmd.erase(0, cmd.find_first_not_of(" \t\r\n\f\v"));
+    // Find last non-whitespace character and erase after it
+    cmd.erase(cmd.find_last_not_of(" \t\r\n\f\v") + 1);
 
-/**
- * TO DO:
- *
- * - run server
- * -
- */
+    std::transform(
+        cmd.begin(), cmd.end(), cmd.begin(),
+        [](unsigned char c) { return std::tolower(c); });
 
-int main() {
-    Message msg("test 1");
-    msg.print();
+    return cmd;
+}
 
-    return 0;
+void run_server() {
+    std::cout << "running Server\n";
+}
+
+void run_client() {
+    std::cout << "running Client\n";
+}
+
+int main(int argc, char* argv[]) {
+    argparse::ArgumentParser program("Chat App", std::to_string(VERSION));
+
+    program.add_argument("command")
+        .help("Select the mode to run [ Server / Client ]")
+        .default_value(std::string{"client"});
+
+    try {
+        program.parse_args(argc, argv);
+    } catch (const std::exception& err) {
+        std::cerr << err.what() << std::endl;
+        std::cerr << program;
+        return 1;
+    }
+
+    std::string command = clean_command(program.get<std::string>("command"));
+
+    if (command == "server") {
+        run_server();
+        return 0;
+    } else if (command == "client") {
+        run_client();
+        return 0;
+    } else {
+        std::cout << "Error: <" << command << "> is no valid\n";
+        std::cout << "Please enter Server or Client\n";
+        return 1;
+    }
 }

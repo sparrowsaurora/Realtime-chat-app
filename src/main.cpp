@@ -16,6 +16,9 @@
 #include <iostream>
 #include <string>
 
+#include "client/client.h"
+#include "server/server.h"
+
 #define VERSION 1
 
 std::string clean_command(std::string cmd) {
@@ -29,14 +32,6 @@ std::string clean_command(std::string cmd) {
         [](unsigned char c) { return std::tolower(c); });
 
     return cmd;
-}
-
-void run_server() {
-    std::cout << "running Server\n";
-}
-
-void run_client() {
-    std::cout << "running Client\n";
 }
 
 int main(int argc, char* argv[]) {
@@ -57,9 +52,11 @@ int main(int argc, char* argv[]) {
     std::string command = clean_command(program.get<std::string>("command"));
 
     if (command == "server") {
+        std::cout << "running Server\n";
         run_server();
         return 0;
     } else if (command == "client") {
+        std::cout << "running Client\n";
         run_client();
         return 0;
     } else {

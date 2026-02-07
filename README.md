@@ -3,6 +3,13 @@
 _**Abstract:**_ A real time chat application to help me better understand networking.  
 _**Purpose:**_ A terminal application that lets you communicate quickly with others on the same connection.
 
+## Key features
+
+- TCP base
+- CLI based tooling
+- Custom Logging tool
+- client side customisation
+
 ## About the project
 
 An in-terminal realtime chatroom app, with the option to send messages from the terminal or within the UI

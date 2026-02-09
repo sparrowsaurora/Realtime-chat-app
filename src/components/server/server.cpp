@@ -49,6 +49,9 @@ void broadcast(const std::string& msg, int sender_fd) {
             // pointer to data
             // bytes to send
             // no special flags
+        } else {
+            const std::string self_msg = "\r" + msg;
+            send(client.file_descriptor, self_msg.c_str(), self_msg.size(), 0);
         }
     }
 }  // mutex unlocks
@@ -79,7 +82,7 @@ void handle_client(int client_fd) {
         clients.push_back(client);
     }
 
-    std::string join_msg = "[SERVER] " + username + "has joined.\n";
+    std::string join_msg = "[SERVER] " + username + " has joined.\n";
     broadcast(join_msg, client_fd);
 
     // chat loop

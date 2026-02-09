@@ -62,7 +62,7 @@ int main(int argc, char* argv[]) {
         run_client(username);
         return 0;
     } else {
-        std::cout << "Error: <" << command << "> is no valid\n";
+        std::cout << "Error: <" << command << "> is not valid\n";
         std::cout << "Please enter Server or Client\n";
         return 1;
     }

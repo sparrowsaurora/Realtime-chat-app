@@ -58,11 +58,15 @@ int run_client(const std::string& username) {
 
     std::thread(receive_loop, sock).detach();
 
+    // task: prepend user's own alias
+    // opt1: prepend in advance and remove from msg sent to server
+    // opt2: delete line and replace with server-side
     std::string input;
     while (std::getline(std::cin, input)) {
         input += "\n";
         std::string msg = input;
-        send(sock, msg.c_str(), msg.size(), 0);
+        std::cout << "\x1b[1A\x1b[2K\r" << std::flush;
+        std::cout << send(sock, msg.c_str(), msg.size(), 0);
     }
 
     close(sock);

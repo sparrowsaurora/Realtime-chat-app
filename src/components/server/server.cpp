@@ -23,11 +23,12 @@
 #include <vector>
 
 // #include "message.h"
+#include "server.h"
 
 constexpr int PORT = 54000;
 constexpr int BUFFER_SIZE = 1024;
 
-std::vector<int> clients;  // list of client devices
+std::vector<User> clients;  // list of client devices
 std::mutex clients_mutex;
 
 /**
@@ -41,9 +42,9 @@ void broadcast(const std::string& msg, int sender_fd) {
     std::lock_guard<std::mutex> lock(clients_mutex);  // create mutex lock
     // we need thread saftey to handle multiple clients
     // lockguard to avoid manual locking
-    for (int file_descriptor : clients) {
-        if (file_descriptor != sender_fd) {  // skip sender
-            send(file_descriptor, msg.c_str(), msg.size(), 0);
+    for (const User& client : clients) {
+        if (client.file_descriptor != sender_fd) {  // skip sender
+            send(client.file_descriptor, msg.c_str(), msg.size(), 0);
             // send to other file descriptors
             // pointer to data
             // bytes to send
@@ -58,6 +59,30 @@ void broadcast(const std::string& msg, int sender_fd) {
 void handle_client(int client_fd) {
     char buffer[BUFFER_SIZE];
 
+    // get username
+    ssize_t bytes = recv(client_fd, buffer, BUFFER_SIZE, 0);  // read bytes from socket
+    if (bytes <= 0) {
+        close(client_fd);  // disconnected
+        return;
+    }
+
+    std::string username(buffer, bytes);
+
+    // trim newline if present
+    username.erase(username.find_last_not_of("\r\n") + 1);
+
+    User client;
+    client.file_descriptor = client_fd;
+    client.username = username;
+    {
+        std::lock_guard<std::mutex> lock(clients_mutex);
+        clients.push_back(client);
+    }
+
+    std::string join_msg = "[SERVER] " + username + "has joined.\n";
+    broadcast(join_msg, client_fd);
+
+    // chat loop
     while (true) {
         // blocks until data is sent or client is disconnected
         ssize_t bytes = recv(client_fd, buffer, BUFFER_SIZE, 0);  // read bytes from socket
@@ -66,17 +91,27 @@ void handle_client(int client_fd) {
         }
 
         std::string msg(buffer, bytes);  // convert bytes to string
-        broadcast(msg, client_fd);       // send msg
+        std::string named_msg = username + ": " + msg;
+        broadcast(named_msg, client_fd);  // send msg
     }
 
     close(client_fd);  // close socket connection per user
 
     // remove client from global list
-    std::lock_guard<std::mutex> lock(clients_mutex);
-    clients.erase(
-        std::remove(clients.begin(), clients.end(), client_fd),
-        clients.end());
-    std::cout << "User " << client_fd << " disconnected\n";
+    {
+        std::lock_guard<std::mutex> lock(clients_mutex);
+        clients.erase(
+            std::remove_if(
+                clients.begin(),
+                clients.end(),
+                [&](const User& c) {
+                    return c.file_descriptor == client_fd;
+                }),
+            clients.end());
+    }
+
+    std::string leave_msg = "[SERVER] " + username + " disconnected\n";
+    broadcast(leave_msg, client_fd);
 }
 
 int run_server() {
@@ -102,13 +137,9 @@ int run_server() {
         int client_fd = accept(server_fd, nullptr, nullptr);  // accept client connection
         if (client_fd == -1) continue;                        // if client fails to connect, continue
 
-        {  // store client list safely
-            std::lock_guard<std::mutex> lock(clients_mutex);
-            clients.push_back(client_fd);
-        }
-
         // spawn a new thread for the client
-        std::thread(handle_client, client_fd).detach();
+        std::thread(handle_client, client_fd)
+            .detach();
     }
 
     close(server_fd);

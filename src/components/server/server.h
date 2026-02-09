@@ -25,6 +25,11 @@
 // constexpr int PORT = 54000;
 // constexpr int BUFFER_SIZE = 1024;
 
+struct User {
+    int file_descriptor;
+    std::string username;
+};
+
 /**
  * Sends a message to every connected client except the one who sent it
  *

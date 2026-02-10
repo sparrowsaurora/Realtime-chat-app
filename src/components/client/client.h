@@ -15,4 +15,4 @@ std::string get_username(void);
  */
 void receive_loop(int sock);
 
-int run_client(const std::string& username);
+int run_client(const std::string& username, const std::string& colour);

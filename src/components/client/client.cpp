@@ -13,6 +13,7 @@ constexpr int PORT = 54000;
 constexpr int BUFFER_SIZE = 1024;
 
 std::string get_username(void) {
+    std::cout << "Enter username: ";
     std::string username;
     std::getline(std::cin, username);
 
@@ -36,7 +37,7 @@ void receive_loop(int sock) {
     }
 }
 
-int run_client(const std::string& username) {
+int run_client(const std::string& username, const std::string& colour) {
     int sock = socket(AF_INET, SOCK_STREAM, 0);  // init socke
 
     sockaddr_in server{};
@@ -48,19 +49,13 @@ int run_client(const std::string& username) {
         perror("connect");
         return 1;
     }
-    send(sock, username.c_str(), username.size(), 0);
-    send(sock, "\n", 1, 0);
-
-    // std::cout << "Enter username: ";
-    // std::string username = get_username();
-
-    // std::cout << "Connecting to Room as " << username << "\n";
+    std::string setup = username + "|" + colour + "\n";
+    send(sock, setup.c_str(), setup.size(), 0);
 
     std::thread(receive_loop, sock).detach();
 
-    // task: prepend user's own alias
-    // opt1: prepend in advance and remove from msg sent to server
-    // opt2: delete line and replace with server-side
+    // prepend user's own alias
+    // delete line and replace with server-side
     std::string input;
     while (std::getline(std::cin, input)) {
         input += "\n";

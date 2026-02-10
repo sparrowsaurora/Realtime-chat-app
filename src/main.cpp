@@ -57,9 +57,9 @@ int main(int argc, char* argv[]) {
         return 0;
     } else if (command == "client") {
         std::cout << "running Client\n";
-        std::cout << "Enter username: ";
         std::string username = get_username();
-        run_client(username);
+        std::string colour = get_colour();
+        run_client(username, colour);
         return 0;
     } else {
         std::cout << "Error: <" << command << "> is not valid\n";

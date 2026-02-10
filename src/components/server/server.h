@@ -25,10 +25,25 @@
 // constexpr int PORT = 54000;
 // constexpr int BUFFER_SIZE = 1024;
 
+// enum Colour {
+//     RED,
+//     BLUE,
+//     GREEN,
+//     PURPLE,
+//     YELLOW,
+//     PINK,
+//     WHITE,
+// };
+
 struct User {
     int file_descriptor;
     std::string username;
+    std::string colour;
 };
+
+std::string get_colour(void);
+
+std::string colour_msg(std::string msg, const std::string& colour);
 
 /**
  * Sends a message to every connected client except the one who sent it
@@ -37,7 +52,7 @@ struct User {
  * [int] sender file descriptor (basically ID)
  *
  */
-void broadcast(const std::string& msg, int sender_fd);
+void broadcast(const std::string& msg, int sender_fd, const std::string& colour);
 
 /**
  * handle client communication and exit protocol

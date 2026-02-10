@@ -20,6 +20,6 @@ class Logging {
     static void server_log(const std::string& message);
 
    private:
-    static std::string get_time(void);
+    static std::string get_current_time(void);
     static void log(const std::string& log);
 };

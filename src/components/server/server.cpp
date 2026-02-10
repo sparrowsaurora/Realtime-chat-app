@@ -1,6 +1,6 @@
 /*******************************************************************
  *
- * File Name: server.c
+ * File Name: server.cpp
  *
  * Description:
  *   Runs the server that clients connect to.
@@ -24,6 +24,8 @@
 #include <string>
 #include <thread>
 #include <vector>
+
+#include "logging/logging.h"
 
 constexpr int PORT = 54000;
 constexpr int BUFFER_SIZE = 1024;
@@ -77,8 +79,6 @@ std::string colour_msg(const std::string msg, const std::string& colour) {
     } else {
         std::cout << "Unknown colour, using default\n";
     }
-    std::cout << "code: " << colour_code << std::endl;
-    std::cout << "colour: " << colour << std::endl;
     const std::string reset_colour = "\e[0m";
     std::string new_msg = colour_code + msg + reset_colour;
     return new_msg;
@@ -146,6 +146,7 @@ void handle_client(int client_fd) {
     }
 
     std::string join_msg = "[SERVER] " + username + " has joined.\n";
+    Logging::server_log("[SERVER] " + username + " has joined.");
     broadcast(join_msg, client_fd, "yellow");
 
     // chat loop
@@ -158,6 +159,7 @@ void handle_client(int client_fd) {
 
         std::string msg(buffer, bytes);  // convert bytes to string
         std::string named_msg = username + ": " + msg;
+        Logging::message_log(username, msg);
         broadcast(named_msg, client_fd, colour);  // send msg
     }
 
@@ -177,6 +179,7 @@ void handle_client(int client_fd) {
     }
 
     std::string leave_msg = "[SERVER] " + username + " disconnected\n";
+    Logging::server_log("[SERVER] " + username + " disconnected");
     broadcast(leave_msg, client_fd, "yellow");
 }
 
@@ -197,6 +200,7 @@ int run_server() {
     bind(server_fd, (sockaddr*)&addr, sizeof(addr));  // bind socket to address
     listen(server_fd, SOMAXCONN);                     // listen to server with system's normal queue size
 
+    Logging::server_log("[SERVER] Starting");
     std::cout << "Server listening on port " << PORT << "\n";
 
     while (true) {
